@@ -96,6 +96,10 @@ public class PlayClientIntegrationTest extends TestCase {
         URI uri = playClient.getPlayURI(song.getId(), playSession);
         assertNotNull("Playable URI not found", uri);
 
+        // get all of the tracks
+        Collection<Song> songs = playClient.loadAllTracks(playSession);
+        assertNotNull(songs);
+        assertTrue(songs.size() > 0);
     }
 
     public void testLoginFailure() throws IOException, URISyntaxException {

@@ -24,7 +24,7 @@
 
     <groupId>com.faceture</groupId>
     <artifactId>google-play-client-tests</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
 
     <dependencies>
         <dependency>

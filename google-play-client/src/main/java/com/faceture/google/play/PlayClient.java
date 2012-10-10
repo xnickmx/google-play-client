@@ -23,12 +23,10 @@ import com.faceture.google.play.domain.*;
 import com.faceture.rest.RestClient;
 import com.faceture.rest.RestResponse;
 import org.apache.http.HttpStatus;
-
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Client for using the Google Play REST API
@@ -233,5 +231,71 @@ public class PlayClient {
         StreamingUrl streamingUrl = gsonWrapper.fromJson(jsonResponse, StreamingUrl.class);
 
         return new URI(streamingUrl.getUrl());
+    }
+
+    public Collection<Song> loadAllTracks(PlaySession session) throws IOException, URISyntaxException {
+        if (null == session) {
+            throw new IllegalArgumentException("session is null");
+        }
+
+        // create the URL query params
+        Map<String, String> loadAllTracksQueryParams = new HashMap<String, String>();
+        loadAllTracksQueryParams.put(QueryParamConst.U_NAME, QueryParamConst.U_VALUE);
+        loadAllTracksQueryParams.put(QueryParamConst.XT_NAME, session.getXtCookie());
+
+        // create the HTTP headers
+        Map<String, String> loadAllTracksHeaders = new HashMap<String, String>();
+        String authHeader = googleUtil.createAuthHeaderValue(session.getAuthToken());
+        loadAllTracksHeaders.put(HeaderName.AUTHORIZATION, authHeader);
+
+        // create the JSON request
+        LoadAllTracksRequest loadAllTracksRequest = playDomainFactory.createLoadAllTracksRequest();
+        String loadAllTracksJson = gsonWrapper.toJson(loadAllTracksRequest);
+
+        // create the form
+        Map<String, String> form = new HashMap<String, String>();
+        form.put(FormFieldConst.JSON_NAME, loadAllTracksJson);
+
+        boolean continueLoading = true;
+        List<Song> songs = new ArrayList<Song>();
+
+        do {
+            // do the POST
+            RestResponse restResponse = restClient.doPost(Const.USE_HTTPS, HostName.PLAY, Path.MUSIC_LOAD_ALL_TRACKS,
+                    loadAllTracksQueryParams, loadAllTracksHeaders, null, form);
+
+            if (restResponse.getStatusCode() != HttpStatus.SC_OK) {
+                throw new IllegalStateException("Bad status: " + restResponse.getStatusCode() + " response body: " +
+                        restResponse.getBody());
+            }
+
+            // the results will come back in the body
+            String jsonResponse = restResponse.getBody();
+            LoadAllTracksResponse loadAllTracksResponse = gsonWrapper.fromJson(jsonResponse, LoadAllTracksResponse.class);
+
+            // get the songs from the response and add them to the list
+            songs.addAll(loadAllTracksResponse.getPlaylist());
+
+            String continuationToken = loadAllTracksResponse.getContinuationToken();
+
+            if (continuationToken != null && !continuationToken.isEmpty()) {
+                // we need to continue loading
+
+                // create the new request form
+                loadAllTracksRequest = playDomainFactory.createLoadAllTracksRequest(continuationToken);
+                loadAllTracksJson = gsonWrapper.toJson(loadAllTracksRequest);
+
+                form = new HashMap<String, String>();
+                form.put(FormFieldConst.JSON_NAME, loadAllTracksJson);
+            }
+            else {
+                // we're done
+                continueLoading = false;
+            }
+
+        } while(continueLoading);
+
+
+        return songs;
     }
 }

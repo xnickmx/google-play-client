@@ -18,23 +18,26 @@
 package com.faceture.google.play.domain;
 
 /**
- * Creates Play domain objects
+ * Used for making a request to load all tracks
  */
-public class PlayDomainFactory {
+public class LoadAllTracksRequest {
 
-    public SearchRequest createSearchRequest(String q) {
-        if (null == q || q.isEmpty()) {
-            throw new IllegalArgumentException("q is null or empty");
+    private String continuationToken = "";
+
+    public LoadAllTracksRequest() {}
+
+    public LoadAllTracksRequest(String continuationToken) {
+        if (null == continuationToken || continuationToken.isEmpty()) {
+            throw new IllegalArgumentException("continuationToken is null or empty");
         }
-
-        return new SearchRequest(q);
+        this.continuationToken = continuationToken;
     }
 
-    public LoadAllTracksRequest createLoadAllTracksRequest() {
-        return new LoadAllTracksRequest();
+    public String getContinuationToken() {
+        return continuationToken;
     }
 
-    public LoadAllTracksRequest createLoadAllTracksRequest(String continuationToken) {
-        return new LoadAllTracksRequest(continuationToken);
+    public void setContinuationToken(String continuationToken) {
+        this.continuationToken = continuationToken;
     }
 }

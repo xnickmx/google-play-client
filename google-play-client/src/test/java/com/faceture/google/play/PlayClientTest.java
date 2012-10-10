@@ -359,4 +359,14 @@ public class PlayClientTest extends TestCase {
         assertEquals(uri, playClient.getPlayURI(songId, playSession));
 
     }
+
+    public void testLoadAllTracksFailsDueToNullPlaySession() throws IOException, URISyntaxException {
+        try {
+            playClient.loadAllTracks(null);
+
+            fail("should have thrown exception");
+        }
+        catch (IllegalArgumentException e) {}
+    }
+
 }

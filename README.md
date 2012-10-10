@@ -10,15 +10,19 @@ This is a stateless Google Play client inspired by:
 
 The main reason I created this client is that I wanted a stateless implementation. This makes using multiple Google Play accounts simultaneously easy. This is helpful for web applications that may have multiple users who wish to play music simultaneously.
 
+GOOGLE PLAY REST API:
+This client library wraps the Google Play REST API. I have documented this API here: https://docs.google.com/document/d/1-O3xIlBVnLDNLdeM9s2-_yj0XGn-WHjk19s-YYphVF0/edit
+
 WHAT IT DOES:
-The API is lacking many features right now, because I personally didn't need them. I would welcome any new feature someone would like to contribute. I may get around to adding more in the future.
+This client library is lacking many features right now, because I personally didn't need them. I would welcome any new feature someone would like to contribute. I may get around to adding more in the future.
 
 You can currently:
 - Login to Google Play
 - Search for tracks
 - Get a playable track URL
+- Retrieve all of the tracks in the user's collection
 
-HOW TO USER IT:
+HOW TO USE IT:
 This code is written in Java and builds using Maven 2.
 
 There are two separate Maven modules:

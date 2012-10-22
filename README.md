@@ -21,6 +21,7 @@ You can currently:
 - Search for tracks
 - Get a playable track URL
 - Retrieve all of the tracks in the user's collection
+- Retrieve all of the playlists in the user's collection
 
 HOW TO USE IT:
 This code is written in Java and builds using Maven 2.

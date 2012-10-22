@@ -18,6 +18,7 @@
 
 package com.faceture.google.play;
 
+import com.faceture.google.play.domain.Playlist;
 import com.faceture.google.play.domain.SearchResults;
 import com.faceture.google.play.domain.Song;
 import junit.framework.TestCase;
@@ -100,6 +101,19 @@ public class PlayClientIntegrationTest extends TestCase {
         Collection<Song> songs = playClient.loadAllTracks(playSession);
         assertNotNull(songs);
         assertTrue(songs.size() > 0);
+
+        // get all of the playlists
+        Collection<Playlist> playlists = playClient.loadAllPlaylists(playSession);
+
+        assertNotNull(playlists);
+        Playlist playlist = playlists.iterator().next();
+        Collection<Song> playlistSongs = playlist.getPlaylist();
+        assertNotNull(playlistSongs);
+        Song playlistSong = playlistSongs.iterator().next();
+        assertNotNull(playlistSong);
+        String title = playlistSong.getTitle();
+        assertNotNull(title);
+        assertFalse(title.isEmpty());
     }
 
     public void testLoginFailure() throws IOException, URISyntaxException {

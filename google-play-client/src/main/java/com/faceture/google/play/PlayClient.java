@@ -139,7 +139,7 @@ public class PlayClient {
                 // bad credentials
                 loginResponse = loginResponseFactory.create(LoginResult.BAD_CREDENTIALS, null);
 
-            break;
+                break;
 
             default:
                 // some other status code
@@ -298,4 +298,42 @@ public class PlayClient {
 
         return songs;
     }
+
+    public Collection<Playlist> loadAllPlaylists(PlaySession session) throws IOException, URISyntaxException {
+        if (null == session) {
+            throw new IllegalArgumentException("session is null");
+        }
+
+        // create the URL query params
+        Map<String, String> loadAllPlaylistsQueryParams = new HashMap<String, String>();
+        loadAllPlaylistsQueryParams.put(QueryParamConst.U_NAME, QueryParamConst.U_VALUE);
+        loadAllPlaylistsQueryParams.put(QueryParamConst.XT_NAME, session.getXtCookie());
+
+        // create the HTTP headers
+        Map<String, String> loadAllPlaylistsHeaders = new HashMap<String, String>();
+        String authHeader = googleUtil.createAuthHeaderValue(session.getAuthToken());
+        loadAllPlaylistsHeaders.put(HeaderName.AUTHORIZATION, authHeader);
+
+        // create the form
+        Map<String, String> form = new HashMap<String, String>();
+        form.put(FormFieldConst.JSON_NAME, Const.EMPTY_JSON);
+
+        // do the POST
+        RestResponse restResponse = restClient.doPost(Const.USE_HTTPS, HostName.PLAY, Path.MUSIC_LOAD_PLAYLIST,
+                    loadAllPlaylistsQueryParams, loadAllPlaylistsHeaders, null, form);
+
+        if (restResponse.getStatusCode() != HttpStatus.SC_OK) {
+            throw new IllegalStateException("Bad status: " + restResponse.getStatusCode() + " response body: " +
+                    restResponse.getBody());
+        }
+
+        // parse the response
+        String responseBody = restResponse.getBody();
+
+        LoadAllPlaylistsResponse loadAllPlaylistsResponse = gsonWrapper.fromJson(responseBody, LoadAllPlaylistsResponse.class);
+
+        return loadAllPlaylistsResponse.getPlaylists();
+    }
+
+
 }

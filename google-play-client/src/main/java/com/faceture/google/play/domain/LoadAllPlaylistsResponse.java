@@ -15,17 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.faceture.google.play;
+package com.faceture.google.play.domain;
+
+import java.util.Collection;
 
 /**
- * URL path constants
+ * Response to the LoadAllPlaylists call
  */
-public interface Path {
+public class LoadAllPlaylistsResponse {
 
-    public static final String GOOGLE_LOGIN = "/accounts/ClientLogin";
-    public static final String MUSIC_LOAD_PLAYLIST = "/music/services/loadplaylist";
-    public static final String MUSIC_LOAD_ALL_TRACKS = "/music/services/loadalltracks";
-    public static final String MUSIC_LOGIN = "/music/listen";
-    public static final String MUSIC_PLAY = "/music/play";
-    public static final String MUSIC_SEARCH = "/music/services/search";
+    private Collection<Playlist> playlists;
+
+    public Collection<Playlist> getPlaylists() {
+        return playlists;
+    }
+
+    public void setPlaylists(Collection<Playlist> playlists) {
+        this.playlists = playlists;
+    }
 }

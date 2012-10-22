@@ -28,6 +28,8 @@ import org.apache.http.HttpStatus;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -367,6 +369,44 @@ public class PlayClientTest extends TestCase {
             fail("should have thrown exception");
         }
         catch (IllegalArgumentException e) {}
+    }
+
+    public void testLoadAllPlaylistsFailsDueToNullSession() throws IOException, URISyntaxException {
+        try {
+            playClient.loadAllPlaylists(null);
+
+            fail("should have thrown exception");
+        }
+        catch (IllegalArgumentException e) {}
+    }
+
+    @SuppressWarnings("unchecked")
+    public void testLoadAllPlaylistsHappyPath() throws IOException, URISyntaxException {
+        // mock interactions
+        RestResponse restResponse = mock(RestResponse.class);
+        when(restClient.doPost(eq(Const.USE_HTTPS), eq(HostName.PLAY), eq(Path.MUSIC_LOAD_PLAYLIST),
+                    isA((Map.class)), isA(Map.class), (Map<String, String>) isNull(), isA(Map.class))).thenReturn(restResponse);
+
+        when(restResponse.getStatusCode()).thenReturn(HttpStatus.SC_OK);
+
+        String responseBody = "responseBody";
+        when(restResponse.getBody()).thenReturn(responseBody);
+
+        LoadAllPlaylistsResponse loadAllPlaylistsResponse = mock(LoadAllPlaylistsResponse.class);
+        when(gsonWrapper.fromJson(responseBody, LoadAllPlaylistsResponse.class)).thenReturn(loadAllPlaylistsResponse);
+
+        Playlist playlist = mock(Playlist.class);
+        Collection<Playlist> playlists = new ArrayList<Playlist>();
+        playlists.add(playlist);
+
+        when(loadAllPlaylistsResponse.getPlaylists()).thenReturn(playlists);
+
+        // do the call
+        Collection<Playlist> resultPlaylists = playClient.loadAllPlaylists(playSession);
+
+        // verify results
+        assertNotNull(resultPlaylists);
+        assertFalse(resultPlaylists.isEmpty());
     }
 
 }
